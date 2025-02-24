@@ -1,12 +1,14 @@
 package me.greysilly7.npcsmadeasy;
 
-import com.github.juliarn.npclib.api.Npc;
 import com.github.juliarn.npclib.api.Platform;
 import com.github.juliarn.npclib.api.Position;
 import com.github.juliarn.npclib.api.event.InteractNpcEvent;
 import com.github.juliarn.npclib.api.event.ShowNpcEvent;
 import com.github.juliarn.npclib.api.profile.Profile;
 import com.github.juliarn.npclib.fabric.FabricPlatform;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+
 import me.greysilly7.npcsmadeasy.config.Config;
 import me.greysilly7.npcsmadeasy.config.NPC;
 import net.fabricmc.api.ModInitializer;
@@ -58,6 +60,7 @@ public class NPCMadeEasyMod implements ModInitializer {
 
     private void registerPayloads() {
         PayloadTypeRegistry.playS2C().register(ServerSwitchPayload.ID, ServerSwitchPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(ServerSwitchPayload.ID, ServerSwitchPayload.CODEC);
     }
 
     private void registerWorldLoadListener(Config config) {
@@ -77,9 +80,7 @@ public class NPCMadeEasyMod implements ModInitializer {
                             world.getRegistryKey().getValue().toString()))
                     .profile(Profile.unresolved(npc.name()))
                     .thenAccept(builder -> {
-                        if (builder instanceof Npc.Builder) {
-                            ((Npc.Builder<ServerWorld, ServerPlayerEntity, ItemStack, ?>) builder).buildAndTrack();
-                        }
+                        builder.buildAndTrack();
                     });
         }
     }
@@ -96,7 +97,13 @@ public class NPCMadeEasyMod implements ModInitializer {
         ServerPlayerEntity player = interactNpcEvent.player();
         config.getNpcByName(npc.profile().name()).ifPresent(npcConfig -> {
             String server = npcConfig.serverToFowardPlayerTo();
-            ServerPlayNetworking.send(player, new ServerSwitchPayload("Connect", server));
+            // ServerPlayNetworking.send(player, new ServerSwitchPayload("Connect",
+            // server));
+
+            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+            out.writeUTF("Connect");
+            out.writeUTF(server);
+            ServerPlayNetworking.send(player, new ServerSwitchPayload(out.toByteArray()));
         });
     }
 
@@ -104,7 +111,7 @@ public class NPCMadeEasyMod implements ModInitializer {
         var npc = showEvent.npc();
         ServerPlayerEntity player = showEvent.player();
         config.getNpcByName(npc.profile().name()).ifPresent(npcConfig -> {
-            npc.lookAt(Position.position(0, 0, 0, npc.position().worldId())).schedule(player);
+            npc.lookAt(Position.position(0.564, 17, 0.337, npc.position().worldId())).schedule(player);
             npc.rotate(npcConfig.yaw(), npcConfig.pitch()).schedule(player);
             ;
         });
