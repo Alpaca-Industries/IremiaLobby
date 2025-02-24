@@ -102,8 +102,11 @@ public class NPCMadeEasyMod implements ModInitializer {
 
     private void handleNpcShow(ShowNpcEvent.Post showEvent, Config config) {
         var npc = showEvent.npc();
+        ServerPlayerEntity player = showEvent.player();
         config.getNpcByName(npc.profile().name()).ifPresent(npcConfig -> {
-            npc.rotate(npcConfig.yaw(), npcConfig.pitch());
+            npc.lookAt(Position.position(0, 0, 0, npc.position().worldId())).schedule(player);
+            npc.rotate(npcConfig.yaw(), npcConfig.pitch()).schedule(player);
+            ;
         });
     }
 }
