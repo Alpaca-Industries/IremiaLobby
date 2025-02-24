@@ -38,7 +38,7 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     annotationProcessor modImplementation("io.wispforest:owo-lib:0.12.20+1.21.4")
-    implementation("io.github.juliarn:npc-lib-fabric:${npc_lib_fabric_verson}")
+    modImplementation("io.github.juliarn:npc-lib-fabric:${npc_lib_fabric_verson}")
     implementation 'com.google.code.gson:gson:2.12.1'
 
 }

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import me.greysilly7.npcsmadeasy.NPCMadeEasyMod;
-import me.greysilly7.npcsmadeasy.config.NPC;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -14,37 +13,42 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Config {
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Type NPC_LIST_TYPE = new TypeToken<List<NPC>>() {
+    }.getType();
     private List<NPC> npcs;
 
     // Load configuration from JSON file
     public void loadConfig(Path configPath) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        // Check if the config file exists
         if (Files.notExists(configPath)) {
-            // Create default config
-            npcs = createDefaultNpcs();
-            saveConfig(configPath); // Save the default config
+            createAndSaveDefaultConfig(configPath);
         } else {
-            // Load existing config
-            try (FileReader reader = new FileReader(configPath.toFile())) {
-                Type npcListType = new TypeToken<List<NPC>>() {}.getType();
-                npcs = gson.fromJson(reader, npcListType);
-            } catch (IOException e) {
-                NPCMadeEasyMod.LOGGER.error(e.toString());
-            }
+            loadExistingConfig(configPath);
+        }
+    }
+
+    private void createAndSaveDefaultConfig(Path configPath) {
+        npcs = createDefaultNpcs();
+        saveConfig(configPath);
+    }
+
+    private void loadExistingConfig(Path configPath) {
+        try (FileReader reader = new FileReader(configPath.toFile())) {
+            npcs = GSON.fromJson(reader, NPC_LIST_TYPE);
+        } catch (IOException e) {
+            NPCMadeEasyMod.LOGGER.error("Failed to load config from {}: {}", configPath, e.getMessage());
         }
     }
 
     // Save configuration to JSON file
     public void saveConfig(Path configPath) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter(configPath.toFile())) {
-            gson.toJson(npcs, writer);
+            GSON.toJson(npcs, writer);
         } catch (IOException e) {
-            NPCMadeEasyMod.LOGGER.error(e.toString());
+            NPCMadeEasyMod.LOGGER.error("Failed to save config to {}: {}", configPath, e.getMessage());
         }
     }
 
@@ -63,12 +67,9 @@ public class Config {
     }
 
     // Fetch a specific NPC by name
-    public NPC getNpcByName(String name) {
-        for (NPC npc : npcs) {
-            if (npc.getName().equalsIgnoreCase(name)) {
-                return npc;
-            }
-        }
-        return null; // Return null if not found
+    public Optional<NPC> getNpcByName(String name) {
+        return npcs.stream()
+                .filter(npc -> npc.name().equalsIgnoreCase(name))
+                .findFirst();
     }
 }
