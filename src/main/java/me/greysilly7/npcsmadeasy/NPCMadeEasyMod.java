@@ -5,12 +5,16 @@ import com.github.juliarn.npclib.api.Position;
 import com.github.juliarn.npclib.api.event.InteractNpcEvent;
 import com.github.juliarn.npclib.api.event.ShowNpcEvent;
 import com.github.juliarn.npclib.api.profile.Profile;
+import com.github.juliarn.npclib.api.profile.ProfileProperty;
 import com.github.juliarn.npclib.fabric.FabricPlatform;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
 import me.greysilly7.npcsmadeasy.config.Config;
+import me.greysilly7.npcsmadeasy.config.MineSkin;
 import me.greysilly7.npcsmadeasy.config.NPC;
+import me.greysilly7.npcsmadeasy.util.MojangSkinGenerator;
+import me.greysilly7.npcsmadeasy.util.mineskin.MineSkinResponse;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -20,15 +24,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
+
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.Set;
+import java.util.UUID;
 
 public class NPCMadeEasyMod implements ModInitializer {
     public static final String MOD_ID = "npcs_made_easy";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    public static final Config CONFIG = new Config();
 
     private final @NotNull Platform<ServerWorld, ServerPlayerEntity, ItemStack, ?> platform = FabricPlatform
             .fabricNpcPlatformBuilder()
@@ -41,16 +49,15 @@ public class NPCMadeEasyMod implements ModInitializer {
     public void onInitialize() {
         Path configPath = getConfigPath();
 
-        Config config = new Config();
         try {
-            config.loadConfig(configPath);
+            CONFIG.loadConfig(configPath);
         } catch (Exception e) {
             LOGGER.error("Failed to load config from {}: {}", configPath, e.getMessage());
             return;
         }
 
         registerPayloads();
-        registerWorldLoadListener(config);
+        registerWorldLoadListener(CONFIG);
     }
 
     private Path getConfigPath() {
@@ -73,16 +80,35 @@ public class NPCMadeEasyMod implements ModInitializer {
     }
 
     private void spawnNpcs(Config config, ServerWorld world) {
+        MineSkin mineSkin = NPCMadeEasyMod.CONFIG.getMineSkin();
+
         for (NPC npc : config.getNpcs()) {
             LOGGER.info("Spawning NPC {}", npc.name());
-            platform.newNpcBuilder()
+            var npcbuilder = platform.newNpcBuilder()
                     .position(Position.position(npc.position().x(), npc.position().y(), npc.position().z(),
-                            world.getRegistryKey().getValue().toString()))
-                    .profile(Profile.unresolved(npc.name()))
-                    .thenAccept(builder -> {
-                        builder.buildAndTrack();
-                    });
+                            world.getRegistryKey().getValue().toString()));
+
+            if (mineSkin != null && mineSkin.enable()) {
+                var skin = MojangSkinGenerator.fetchFromUUID(npc.name());
+                if (skin instanceof MineSkinResponse) {
+                    MineSkinResponse mineSkinResponse = (MineSkinResponse) skin;
+
+                    npcbuilder
+                            .profile(Profile.resolved(mineSkinResponse.name(), UUID.fromString(mineSkinResponse.uuid()),
+                                    Set.of(ProfileProperty.property("textures",
+                                            mineSkinResponse.texture().data().value(),
+                                            mineSkinResponse.texture().data().signature()))));
+                } else {
+                    npcbuilder.profile(Profile.unresolved(npc.name()));
+                }
+            } else {
+                npcbuilder.profile(Profile.unresolved(npc.name()));
+            }
+
+            npcbuilder.profile(Profile.unresolved(npc.name()));
+            npcbuilder.buildAndTrack();
         }
+
     }
 
     private void registerNPCListeners(Config config) {
