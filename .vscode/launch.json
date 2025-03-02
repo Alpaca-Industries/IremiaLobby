@@ -3,29 +3,20 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Minecraft Client",
+      "name": "MinestormServer",
       "request": "launch",
-      "cwd": "${workspaceFolder}/run",
-      "console": "integratedTerminal",
-      "stopOnEntry": false,
-      "mainClass": "net.fabricmc.devlaunchinjector.Main",
-      "vmArgs": "-Dfabric.dli.config\u003d/home/greysilly7/git/NPCSMadeEasy/.gradle/loom-cache/launch.cfg -Dfabric.dli.env\u003dclient -Dfabric.dli.main\u003dnet.fabricmc.loader.impl.launch.knot.KnotClient",
-      "args": "",
-      "env": {},
-      "projectName": "NPCSMadeEasy"
+      "mainClass": "org.alpacaindustries.lobbyServer.MinestormServer",
+      "projectName": "lobbyServer"
     },
     {
       "type": "java",
-      "name": "Minecraft Server",
+      "name": "MinestormServer",
       "request": "launch",
-      "cwd": "${workspaceFolder}/run",
-      "console": "integratedTerminal",
-      "stopOnEntry": false,
-      "mainClass": "net.fabricmc.devlaunchinjector.Main",
-      "vmArgs": "-Dfabric.dli.config\u003d/home/greysilly7/git/NPCSMadeEasy/.gradle/loom-cache/launch.cfg -Dfabric.dli.env\u003dserver -Dfabric.dli.main\u003dnet.fabricmc.loader.impl.launch.knot.KnotServer",
-      "args": "nogui",
-      "env": {},
-      "projectName": "NPCSMadeEasy"
+      "mainClass": "me.greysilly7.minestorm_tests_server.MinestormServer",
+      "projectName": "minestorm-test-server",
+      "env": {
+        "ENABLE_STATISTICS": "true"
+      }
     }
   ]
 }
