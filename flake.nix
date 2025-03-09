@@ -34,10 +34,9 @@
           inherit inputs pkgs;
           modules = [
             {
-              packages = [pkgs.openjdk21 pkgs.gradle];
               languages.java = {
                 enable = true;
-                package = pkgs.openjdk21;
+                jdk.package = pkgs.openjdk23;
                 gradle.enable = true;
               };
             }
