@@ -16,6 +16,7 @@ dependencies {
     implementation("net.minestom:minestom-snapshots:1_21_4-6490538291")
     implementation("io.github.juliarn:npc-lib-minestom:3.0.0-beta11")
     implementation("com.google.code.gson:gson:2.12.1")
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.5")
 }
 
 tasks.test {

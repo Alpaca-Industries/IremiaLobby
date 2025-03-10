@@ -1,22 +1,4 @@
 {
   "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "java",
-      "name": "MinestormServer",
-      "request": "launch",
-      "mainClass": "org.alpacaindustries.lobbyServer.MinestormServer",
-      "projectName": "lobbyServer"
-    },
-    {
-      "type": "java",
-      "name": "MinestormServer",
-      "request": "launch",
-      "mainClass": "me.greysilly7.minestorm_tests_server.MinestormServer",
-      "projectName": "minestorm-test-server",
-      "env": {
-        "ENABLE_STATISTICS": "true"
-      }
-    }
-  ]
+  "configurations": []
 }
