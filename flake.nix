@@ -34,10 +34,13 @@
           inherit inputs pkgs;
           modules = [
             {
-              languages.java = {
-                enable = true;
-                jdk.package = pkgs.openjdk23;
-                gradle.enable = true;
+              languages = {
+                kotlin.enable = true;
+                java = {
+                  enable = true;
+                  jdk.package = pkgs.openjdk23;
+                  gradle.enable = true;
+                };
               };
             }
           ];

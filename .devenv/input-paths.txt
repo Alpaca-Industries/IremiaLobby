@@ -1,2 +1,0 @@
-/home/greysilly7/git/NPCSMadeEasy/devenv.lock
-/home/greysilly7/git/NPCSMadeEasy/devenv.nix
