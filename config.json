@@ -1,0 +1,42 @@
+{
+  "host": "0.0.0.0",
+  "port": 25565,
+  "velocityEnabled": true,
+  "velocitySigned": false,
+  "velocityForwardingSecret": "zDzuq25RtcGUeY",
+  "npcs": [
+    {
+      "name": "Survival",
+      "server": "survival",
+      "skinValue": "eyJ0aW1lc3RhbXAiOjE1NzM3NTc0NDgxMjQsInByb2ZpbGVJZCI6IjdkNjU1MjQ5NGZiZDQyODdiNjgyMjJkMTdjNjVhM2ZkIiwicHJvZmlsZU5hbWUiOiJCdWRkaGEiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzE3YzZjNDU4NWJjMmRjZWM2ODU1N2YwZDVmMmE1NTNkYzEyY2RjY2JmNjBiOGI3OWM4NDI0NWMxMzVmZDcifX19",
+      "skinSignature": "AF19kyc6XRBQGUr6JYZQpRiUngfHRa/oRh/t+xORrWcBSWrl1EzZ5QMxZeZLeE+e4r2dYRvlH/0U98Ccgi5zY05n4I9Na6jo3V7gpQZ2X8eDtq9wQ4ZWKh2kCg6HJgGWkvRncGAmLDZvxMw0QgJC2nxqZl+nV5jkruA5i0HY+lpGQ2q7yA9tmmNgdvIuSY7yFsh2wHm7thnSth+Y8RqRgKu/kAZESpQ4/Vbl5/YukHdiJ3nWHrOfW489zN4HlEqJ1KKVePdlpLYAvNslZdt7oN+BEq+aEzMZd4WL+kLzVE4ILarzTiJPIcibFHXS8+bc3OSFVdbrmvNBbIkRwJDrt6G0QWeT4KwJwwTfkrwZVoRo/tOm1nEL6oiKWUDZrf0GCLEXkKubI8QrqJ7KEU6vB73wVUwXzGBFryC3XBoPVnGQHLnqKuQSSB/ChESrLiPSsVLRj+SgLK8lQrCnm+nBZOGiK+w6/qq5xWpu0hpYlbK1MUteyv7Yyl/jpApf7s2HxuLZgN7s1gMr8nKtzis4U0BBbO3NJ95wlGSS2qJBHJYImtd0rUQqLTaG2BU0k0nNOzGVuZo/sV5pKrvoqx35xXAm0/WK+AgRtgJCVka4Czl/JIRhvpJi9I+5ijDul1VxEVTMsOcBd15tyi6dITTUuRNVGCsRVT7Bhq9qP8AvU0k\u003d",
+      "x": 0.5,
+      "y": 17.0,
+      "z": 19.5,
+      "yaw": 180.0,
+      "pitch": 20.0
+    },
+       {
+      "name": "Creative",
+      "server": "creative",
+      "skinValue": "eyJ0aW1lc3RhbXAiOjE1NzM3NTc0NDgxMjQsInByb2ZpbGVJZCI6IjdkNjU1MjQ5NGZiZDQyODdiNjgyMjJkMTdjNjVhM2ZkIiwicHJvZmlsZU5hbWUiOiJCdWRkaGEiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzE3YzZjNDU4NWJjMmRjZWM2ODU1N2YwZDVmMmE1NTNkYzEyY2RjY2JmNjBiOGI3OWM4NDI0NWMxMzVmZDcifX19",
+      "skinSignature": "AF19kyc6XRBQGUr6JYZQpRiUngfHRa/oRh/t+xORrWcBSWrl1EzZ5QMxZeZLeE+e4r2dYRvlH/0U98Ccgi5zY05n4I9Na6jo3V7gpQZ2X8eDtq9wQ4ZWKh2kCg6HJgGWkvRncGAmLDZvxMw0QgJC2nxqZl+nV5jkruA5i0HY+lpGQ2q7yA9tmmNgdvIuSY7yFsh2wHm7thnSth+Y8RqRgKu/kAZESpQ4/Vbl5/YukHdiJ3nWHrOfW489zN4HlEqJ1KKVePdlpLYAvNslZdt7oN+BEq+aEzMZd4WL+kLzVE4ILarzTiJPIcibFHXS8+bc3OSFVdbrmvNBbIkRwJDrt6G0QWeT4KwJwwTfkrwZVoRo/tOm1nEL6oiKWUDZrf0GCLEXkKubI8QrqJ7KEU6vB73wVUwXzGBFryC3XBoPVnGQHLnqKuQSSB/ChESrLiPSsVLRj+SgLK8lQrCnm+nBZOGiK+w6/qq5xWpu0hpYlbK1MUteyv7Yyl/jpApf7s2HxuLZgN7s1gMr8nKtzis4U0BBbO3NJ95wlGSS2qJBHJYImtd0rUQqLTaG2BU0k0nNOzGVuZo/sV5pKrvoqx35xXAm0/WK+AgRtgJCVka4Czl/JIRhvpJi9I+5ijDul1VxEVTMsOcBd15tyi6dITTUuRNVGCsRVT7Bhq9qP8AvU0k\u003d",
+      "x": 4.5,
+      "y": 17.0,
+      "z": 17.5,
+      "yaw": 150.0,
+      "pitch": 10.0
+    },
+       {
+      "name": "Soon",
+      "server": "lobby",
+      "skinValue": "eyJ0aW1lc3RhbXAiOjE1NzM3NTc0NDgxMjQsInByb2ZpbGVJZCI6IjdkNjU1MjQ5NGZiZDQyODdiNjgyMjJkMTdjNjVhM2ZkIiwicHJvZmlsZU5hbWUiOiJCdWRkaGEiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzE3YzZjNDU4NWJjMmRjZWM2ODU1N2YwZDVmMmE1NTNkYzEyY2RjY2JmNjBiOGI3OWM4NDI0NWMxMzVmZDcifX19",
+      "skinSignature": "AF19kyc6XRBQGUr6JYZQpRiUngfHRa/oRh/t+xORrWcBSWrl1EzZ5QMxZeZLeE+e4r2dYRvlH/0U98Ccgi5zY05n4I9Na6jo3V7gpQZ2X8eDtq9wQ4ZWKh2kCg6HJgGWkvRncGAmLDZvxMw0QgJC2nxqZl+nV5jkruA5i0HY+lpGQ2q7yA9tmmNgdvIuSY7yFsh2wHm7thnSth+Y8RqRgKu/kAZESpQ4/Vbl5/YukHdiJ3nWHrOfW489zN4HlEqJ1KKVePdlpLYAvNslZdt7oN+BEq+aEzMZd4WL+kLzVE4ILarzTiJPIcibFHXS8+bc3OSFVdbrmvNBbIkRwJDrt6G0QWeT4KwJwwTfkrwZVoRo/tOm1nEL6oiKWUDZrf0GCLEXkKubI8QrqJ7KEU6vB73wVUwXzGBFryC3XBoPVnGQHLnqKuQSSB/ChESrLiPSsVLRj+SgLK8lQrCnm+nBZOGiK+w6/qq5xWpu0hpYlbK1MUteyv7Yyl/jpApf7s2HxuLZgN7s1gMr8nKtzis4U0BBbO3NJ95wlGSS2qJBHJYImtd0rUQqLTaG2BU0k0nNOzGVuZo/sV5pKrvoqx35xXAm0/WK+AgRtgJCVka4Czl/JIRhvpJi9I+5ijDul1VxEVTMsOcBd15tyi6dITTUuRNVGCsRVT7Bhq9qP8AvU0k\u003d",
+      "x": -3.5,
+      "y": 17.0,
+      "z": 17.5,
+      "yaw": 180.0,
+      "pitch": 20.0
+    }
+  ]
+}
