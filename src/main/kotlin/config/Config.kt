@@ -1,12 +1,16 @@
 package org.alpacaindustries.config
 
+import java.util.UUID
+
 data class Config(
         val host: String,
         val port: Int,
+        val svcPort: Int,
         val velocityEnabled: Boolean,
         val velocitySigned: Boolean,
         val velocityForwardingSecret: String,
-        val npcs: List<NPC> = emptyList()
+        val npcs: List<NPC> = emptyList(),
+        val ops: List<UUID> = emptyList()
 )
 
 data class NPC(

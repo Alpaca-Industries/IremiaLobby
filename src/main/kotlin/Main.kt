@@ -13,6 +13,7 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.UUID
+import dev.lu15.voicechat.VoiceChat
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
@@ -31,12 +32,13 @@ import net.minestom.server.instance.anvil.AnvilLoader
 import net.minestom.server.item.ItemStack
 import org.alpacaindustries.config.Config
 import org.alpacaindustries.config.ConfigLoader
+import GamemodeCommand
 
-object MinestomServer {
+object MinestormServer {
+    private val logger = KotlinLogging.logger {}
 
-    private val logger = KotlinLogging.logger {  }
 
-    private val config: Config =
+    public val config: Config =
             runCatching { ConfigLoader.loadConfig() }.getOrElse {
                 throw ExceptionInInitializerError(it)
             }
@@ -64,6 +66,9 @@ object MinestomServer {
         instanceContainer.chunkLoader = AnvilLoader(worldPath)
         instanceContainer.setChunkSupplier(::LightingChunk)
 
+        // We hate daylight cycle
+        instanceContainer.setTimeRate(0);
+
         // Set up event handlers
         setupEventHandlers()
 
@@ -76,7 +81,12 @@ object MinestomServer {
         spawnNPCS()
         addNPCEvents()
 
+        MinecraftServer.getCommandManager().register(GamemodeCommand(config.ops))
+
         // Start the server
+        logger.info { "Starting server on ${config.host}:${config.port}" }
+        logger.info { "Starting Simple Voice Chat server on ${config.host}:${config.svcPort}" }
+        val voicechat = VoiceChat.builder(config.host, config.svcPort).enable()
         minecraftServer.start(config.host, config.port)
     }
 
@@ -86,27 +96,35 @@ object MinestomServer {
             val player: Player = event.player
             event.spawningInstance = instanceContainer
 
-            // Use found spawn point or default if not yet available
             player.respawnPoint = Pos(0.0, 17.0, 0.0)
 
             player.gameMode = GameMode.ADVENTURE
         }
 
+        val attackCooldowns = mutableMapOf<UUID, Long>()
+        val attackStacks = mutableMapOf<UUID, Int>()
+        val cooldownTime = 1000L // 1 second cooldown
+        val maxStacks = 100
+
         globalEventHandler.addListener(EntityAttackEvent::class.java) { event ->
             val victim = event.target as? Player ?: return@addListener
             val attacker = event.entity as? Player ?: return@addListener
+            val currentTime = System.currentTimeMillis()
 
-            attacker.sendMessage("${victim.username} §c got hit!")
-            victim.damage(Damage.fromPlayer(attacker, 1.0f))
+            val lastAttackTime = attackCooldowns[attacker.uuid] ?: 0L
+            if (currentTime - lastAttackTime < cooldownTime) {
+                return@addListener
+            }
+
+            attackCooldowns[attacker.uuid] = currentTime
+            val currentStacks = attackStacks.getOrDefault(attacker.uuid, 0) + 1
+            attackStacks[attacker.uuid] = currentStacks.coerceAtMost(maxStacks)
+
+            MinecraftServer.getConnectionManager().onlinePlayers.forEach { onlinePlayer ->
+                onlinePlayer.sendMessage("${attacker.username} hit ${victim.username} with stack $currentStacks!")
+            }
+            victim.damage(Damage.fromPlayer(attacker, 1.0f * currentStacks))
         }
-
-        globalEventHandler.addListener(EntityDamageEvent::class.java) { event ->
-            val victim = event.entity as? Player ?: return@addListener
-            val attacker = event.damage.source as? Player ?: return@addListener
-            attacker.sendMessage("${victim.username} §c got hit!")
-            event.isCancelled = false
-        }
-
         globalEventHandler.addListener(PlayerChatEvent::class.java) { event ->
             event.isCancelled = true
         }
@@ -176,7 +194,9 @@ object MinestomServer {
                                     "bungeecord:main",
                                     byteArrayStream.toByteArray()
                             )
-                            logger.info { "Sending player ${player.username} to server ${npc.server}" }
+                            logger.info {
+                                "Sending player ${player.username} to server ${npc.server}"
+                            }
                         }
                     }
                 } catch (e: IOException) {
@@ -192,6 +212,7 @@ object MinestomServer {
                 .addShutdownHook(
                         Thread {
                             println("Shutting down server...")
+                            instanceContainer.saveChunksToStorage()
                             MinecraftServer.stopCleanly()
                         }
                 )

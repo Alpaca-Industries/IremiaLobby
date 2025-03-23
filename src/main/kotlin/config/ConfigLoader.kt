@@ -32,6 +32,7 @@ object ConfigLoader {
             Config(
                     host = "0.0.0.0",
                     port = 25565,
+                    svcPort = 25565,
                     velocityEnabled = false,
                     velocitySigned = false,
                     velocityForwardingSecret = "",
