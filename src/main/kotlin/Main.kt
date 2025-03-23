@@ -211,7 +211,7 @@ object MinestormServer {
         Runtime.getRuntime()
                 .addShutdownHook(
                         Thread {
-                            println("Shutting down server...")
+                            logger.info { "Shutting down server..." }
                             instanceContainer.saveChunksToStorage()
                             MinecraftServer.stopCleanly()
                         }
