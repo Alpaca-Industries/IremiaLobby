@@ -1,11 +1,13 @@
 package org.alpacaindustries
 
+import GamemodeCommand
 import com.github.juliarn.npclib.api.Npc
 import com.github.juliarn.npclib.api.Position
 import com.github.juliarn.npclib.api.event.InteractNpcEvent
 import com.github.juliarn.npclib.api.profile.Profile
 import com.github.juliarn.npclib.api.profile.ProfileProperty
 import com.github.juliarn.npclib.minestom.MinestomPlatform
+import dev.lu15.voicechat.VoiceChat
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
@@ -13,16 +15,15 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.UUID
-import dev.lu15.voicechat.VoiceChat
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
 import net.minestom.server.entity.Player
 import net.minestom.server.entity.damage.Damage
 import net.minestom.server.event.entity.EntityAttackEvent
-import net.minestom.server.event.entity.EntityDamageEvent
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerChatEvent
+import net.minestom.server.event.player.PlayerMoveEvent
 import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.velocity.VelocityProxy
 import net.minestom.server.instance.Instance
@@ -30,13 +31,17 @@ import net.minestom.server.instance.InstanceContainer
 import net.minestom.server.instance.LightingChunk
 import net.minestom.server.instance.anvil.AnvilLoader
 import net.minestom.server.item.ItemStack
+import net.minestom.server.scoreboard.Sidebar
+import net.minestom.server.utils.time.TimeUnit
+import net.minestom.server.timer.Task
+import net.minestom.server.timer.TaskSchedule
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.Component
 import org.alpacaindustries.config.Config
 import org.alpacaindustries.config.ConfigLoader
-import GamemodeCommand
 
 object MinestormServer {
     private val logger = KotlinLogging.logger {}
-
 
     public val config: Config =
             runCatching { ConfigLoader.loadConfig() }.getOrElse {
@@ -67,7 +72,7 @@ object MinestormServer {
         instanceContainer.setChunkSupplier(::LightingChunk)
 
         // We hate daylight cycle
-        instanceContainer.setTimeRate(0);
+        instanceContainer.setTimeRate(0)
 
         // Set up event handlers
         setupEventHandlers()
@@ -80,6 +85,7 @@ object MinestormServer {
 
         spawnNPCS()
         addNPCEvents()
+        parkourTimer()
 
         MinecraftServer.getCommandManager().register(GamemodeCommand(config.ops))
 
@@ -121,7 +127,9 @@ object MinestormServer {
             attackStacks[attacker.uuid] = currentStacks.coerceAtMost(maxStacks)
 
             MinecraftServer.getConnectionManager().onlinePlayers.forEach { onlinePlayer ->
-                onlinePlayer.sendMessage("${attacker.username} hit ${victim.username} with stack $currentStacks!")
+                onlinePlayer.sendMessage(
+                        "${attacker.username} hit ${victim.username} with stack $currentStacks!"
+                )
             }
             victim.damage(Damage.fromPlayer(attacker, 1.0f * currentStacks))
         }
@@ -208,14 +216,20 @@ object MinestormServer {
     }
 
     private fun addShutdownHook() {
-        Runtime.getRuntime()
-                .addShutdownHook(
-                        Thread {
-                            logger.info { "Shutting down server..." }
-                            instanceContainer.saveChunksToStorage()
-                            MinecraftServer.stopCleanly()
-                        }
-                )
+        val shutdownHook = Thread {
+            logger.info { "Shutting down server..." }
+            instanceContainer.saveChunksToStorage()
+            MinecraftServer.stopCleanly()
+        }
+
+        Runtime.getRuntime().addShutdownHook(shutdownHook)
+
+        // Handle Ctrl+C
+        Runtime.getRuntime().addShutdownHook(Thread {
+            if (shutdownHook.state != Thread.State.TERMINATED) {
+                shutdownHook.join()
+            }
+        })
     }
 
     private fun initializeVelocity() {
@@ -226,4 +240,39 @@ object MinestormServer {
             // Additional logic for signed velocity
         }
     }
-}
+
+    private fun parkourTimer() {
+        val pressurePlatePos = Pos(0.0, 17.0, -25.0)
+        val playerTimers = mutableMapOf<UUID, Long>()
+        val activeTasks = mutableMapOf<UUID, Task>()
+
+        val globalEventHandler = MinecraftServer.getGlobalEventHandler()
+        globalEventHandler.addListener(PlayerMoveEvent::class.java) { event ->
+            val player = event.player
+            val playerPos = player.position
+            val playerUUID = player.uuid
+
+            if (playerPos.sameBlock(pressurePlatePos)) {
+                val startTime = playerTimers.getOrPut(playerUUID) { System.currentTimeMillis() }
+
+                // If no active task, create one
+                if (!activeTasks.containsKey(playerUUID)) {
+                    val task = player.scheduler().submitTask {
+                        val elapsedTime = (System.currentTimeMillis() - startTime) / 1000
+                        player.sendActionBar(Component.text("Time: $elapsedTime sec", NamedTextColor.GREEN))
+
+                        // Cancel the task if the player drops below Y 16
+                        if (player.position.y <= 16) {
+                            playerTimers.remove(playerUUID)
+                            activeTasks.remove(playerUUID)?.cancel()
+                            player.sendActionBar(Component.empty())
+                            TaskSchedule.stop()
+                        } else {
+                            TaskSchedule.seconds(1)
+                        }
+                    }
+                    activeTasks[playerUUID] = task
+                }
+            }
+        }
+    }}
