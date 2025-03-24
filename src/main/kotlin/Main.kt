@@ -1,6 +1,5 @@
 package org.alpacaindustries
 
-import GamemodeCommand
 import com.github.juliarn.npclib.api.Npc
 import com.github.juliarn.npclib.api.Position
 import com.github.juliarn.npclib.api.event.InteractNpcEvent
@@ -9,12 +8,8 @@ import com.github.juliarn.npclib.api.profile.ProfileProperty
 import com.github.juliarn.npclib.minestom.MinestomPlatform
 import dev.lu15.voicechat.VoiceChat
 import io.github.oshai.kotlinlogging.KotlinLogging
-import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
-import java.util.UUID
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
@@ -31,19 +26,24 @@ import net.minestom.server.instance.InstanceContainer
 import net.minestom.server.instance.LightingChunk
 import net.minestom.server.instance.anvil.AnvilLoader
 import net.minestom.server.item.ItemStack
-import net.minestom.server.scoreboard.Sidebar
-import net.minestom.server.utils.time.TimeUnit
 import net.minestom.server.timer.Task
 import net.minestom.server.timer.TaskSchedule
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.Component
+import org.alpacaindustries.commands.GamemodeCommand
+import org.alpacaindustries.commands.TeleportCommands
 import org.alpacaindustries.config.Config
 import org.alpacaindustries.config.ConfigLoader
+import revxrsal.commands.minestom.MinestomLamp
+import java.io.ByteArrayOutputStream
+import java.io.DataOutputStream
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.*
 
 object MinestormServer {
     private val logger = KotlinLogging.logger {}
 
-    public val config: Config =
+    val config: Config =
             runCatching { ConfigLoader.loadConfig() }.getOrElse {
                 throw ExceptionInInitializerError(it)
             }
@@ -87,12 +87,16 @@ object MinestormServer {
         addNPCEvents()
         parkourTimer()
 
+        val lamp = MinestomLamp.builder().build()
         MinecraftServer.getCommandManager().register(GamemodeCommand(config.ops))
+        lamp.register(TeleportCommands(config.ops))
+
+
 
         // Start the server
         logger.info { "Starting server on ${config.host}:${config.port}" }
         logger.info { "Starting Simple Voice Chat server on ${config.host}:${config.svcPort}" }
-        val voicechat = VoiceChat.builder(config.host, config.svcPort).enable()
+        VoiceChat.builder(config.host, config.svcPort).enable()
         minecraftServer.start(config.host, config.port)
     }
 

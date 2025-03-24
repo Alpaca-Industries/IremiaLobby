@@ -1,3 +1,4 @@
+package org.alpacaindustries.commands
 import net.minestom.server.command.builder.Command
 import net.minestom.server.command.builder.arguments.ArgumentType
 import net.minestom.server.entity.GameMode

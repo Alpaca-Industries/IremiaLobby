@@ -43,5 +43,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-./world
+
+### Testing ###
+./world/
 ./config.json

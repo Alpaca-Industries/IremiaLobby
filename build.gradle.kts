@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
 plugins {
     kotlin("jvm") version "2.1.10"
     id("java")
@@ -20,11 +22,13 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.5")
     implementation("org.slf4j:slf4j-simple:1.8.0-beta2")
     implementation("dev.lu15:simple-voice-chat-minestom:0.1.0-SNAPSHOT")
+    implementation("io.github.revxrsal:lamp.common:4.0.0-rc.9")
+    implementation("io.github.revxrsal:lamp.minestom:4.0.0-rc.9")
 }
 
 tasks.test { useJUnitPlatform() }
 
-kotlin { jvmToolchain(21) }
+kotlin { jvmToolchain(23) }
 
 java {
     toolchain {
@@ -44,5 +48,14 @@ tasks {
     shadowJar {
         mergeServiceFiles()
         archiveClassifier.set("") // Prevent the -all suffix on the shadowjar file.
+    }
+    withType<JavaCompile> {
+        // Preserve parameter names in the bytecode
+        options.compilerArgs.add("-parameters")
+    }
+    withType<KotlinJvmCompile> {
+        compilerOptions {
+            javaParameters = true
+        }
     }
 }
